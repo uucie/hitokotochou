@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ひとこと帳 - シーン別コミュニケーション練習</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171F;
+    --surface:#1E2330;
+    --surface-raised:#272E40;
+    --paper:#FBF7F0;
+    --text:#F3EFE6;
+    --text-muted:#9098A8;
+    --accent:#F2A65A;
+    --accent-deep:#D98A3D;
+    --teal:#6FA8A0;
+    --rose:#E1667A;
+    --line:#333B4E;
+    --radius-a: 26px 26px 26px 6px;
+    --radius-b: 26px 26px 6px 26px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--text);
+    font-family:'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  h1,h2,h3,.heading{
+    font-family:'Zen Maru Gothic', 'Hiragino Sans', sans-serif;
+    margin:0;
+  }
+  #app{
+    max-width:640px;
+    margin:0 auto;
+    padding:28px 20px 64px;
+  }
+  a,button{font-family:inherit;}
+  button{cursor:pointer;border:none;background:none;color:inherit;}
+
+  /* ---------- Home ---------- */
+  .home-header{margin-bottom:22px;}
+  .home-header .brand{
+    display:flex;align-items:baseline;gap:10px;margin-bottom:6px;
+  }
+  .home-header h1{font-size:28px;font-weight:900;letter-spacing:.02em;color:var(--accent);}
+  .home-header .tagline{color:var(--text-muted);font-size:14px;line-height:1.7;}
+
+  .stat-row{
+    display:flex;gap:10px;margin:20px 0 26px;
+  }
+  .stat-chip{
+    flex:1;
+    background:var(--surface);
+    border-radius:18px;
+    padding:14px 14px;
+    text-align:center;
+  }
+  .stat-chip .num{
+    font-family:'Zen Maru Gothic',sans-serif;
+    font-size:22px;font-weight:700;color:var(--accent);
+    display:block;
+  }
+  .stat-chip .label{font-size:12px;color:var(--text-muted);margin-top:2px;display:block;}
+
+  .scene-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:420px){
+    .scene-grid{grid-template-columns:1fr;}
+  }
+  .scene-card{
+    position:relative;
+    background:var(--surface);
+    border-radius:var(--radius-a);
+    padding:18px 16px 20px;
+    text-align:left;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .scene-card:nth-child(even){border-radius:var(--radius-b);}
+  .scene-card:nth-child(even)::after{left:auto;right:22px;}
+  .scene-card::after{
+    content:'';
+    position:absolute;
+    width:13px;height:13px;
+    background:var(--surface);
+    bottom:-5px;left:22px;
+    transform:rotate(45deg);
+    border-radius:3px;
+  }
+  .scene-card:active{transform:scale(.97);}
+  .scene-card .emoji{font-size:26px;display:block;margin-bottom:8px;}
+  .scene-card .name{font-family:'Zen Maru Gothic';font-weight:700;font-size:15px;line-height:1.4;margin-bottom:10px;min-height:42px;}
+  .scene-progress{
+    height:6px;background:var(--surface-raised);border-radius:4px;overflow:hidden;margin-bottom:6px;
+  }
+  .scene-progress > div{height:100%;background:var(--accent);border-radius:4px;}
+  .scene-card .count{font-size:11px;color:var(--text-muted);}
+
+  .footer-link{
+    display:block;text-align:center;margin-top:34px;
+    font-size:12px;color:var(--text-muted);text-decoration:underline;
+    opacity:.7;
+  }
+
+  /* ---------- Scene menu ---------- */
+  .back-btn{
+    display:inline-flex;align-items:center;gap:4px;
+    color:var(--text-muted);font-size:13px;margin-bottom:18px;
+  }
+  .scene-title{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+  .scene-title .emoji{font-size:30px;}
+  .scene-title h2{font-size:22px;font-weight:700;}
+  .scene-tagline{color:var(--text-muted);font-size:13px;margin-bottom:22px;}
+
+  .mode-card{
+    background:var(--surface);
+    border-radius:22px;
+    padding:20px;
+    margin-bottom:14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+  }
+  .mode-card .mtext .mtitle{font-family:'Zen Maru Gothic';font-weight:700;font-size:16px;margin-bottom:4px;}
+  .mode-card .mtext .mdesc{font-size:12px;color:var(--text-muted);line-height:1.6;}
+  .mode-card .go{
+    flex-shrink:0;
+    background:var(--accent);
+    color:#241505;
+    font-weight:700;
+    font-size:13px;
+    padding:10px 16px;
+    border-radius:14px;
+  }
+  .mode-card .go:disabled{background:var(--surface-raised);color:var(--text-muted);}
+
+  /* ---------- Chat bubble practice UI ---------- */
+  .chat-pane{
+    background:var(--surface);
+    border-radius:22px;
+    padding:24px 18px;
+    min-height:280px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:16px;
+    margin-bottom:18px;
+  }
+  .bubble{
+    position:relative;
+    max-width:86%;
+    padding:14px 16px;
+    line-height:1.7;
+    font-size:14.5px;
+    animation:pop .22s ease;
+  }
+  @keyframes pop{
+    from{transform:scale(.9);opacity:0;}
+    to{transform:scale(1);opacity:1;}
+  }
+  .bubble.situation{
+    align-self:flex-start;
+    background:var(--surface-raised);
+    color:var(--text);
+    border-radius:4px 20px 20px 20px;
+  }
+  .bubble.situation::before{
+    content:'シーン';
+    display:block;
+    font-size:10px;
+    color:var(--text-muted);
+    margin-bottom:4px;
+  }
+  .bubble.situation::after{
+    content:'';position:absolute;width:11px;height:11px;
+    background:var(--surface-raised);
+    top:14px;left:-4px;transform:rotate(45deg);border-radius:2px;
+  }
+  .bubble.reply{
+    align-self:flex-end;
+    background:var(--accent);
+    color:#241505;
+    border-radius:20px 4px 20px 20px;
+  }
+  .bubble.reply::before{
+    content:'ひとこと';
+    display:block;
+    font-size:10px;
+    color:#5c3a10;
+    margin-bottom:4px;
+  }
+  .bubble.reply::after{
+    content:'';position:absolute;width:11px;height:11px;
+    background:var(--accent);
+    top:14px;right:-4px;transform:rotate(45deg);border-radius:2px;
+  }
+  .bubble.tip{
+    align-self:flex-end;
+    max-width:86%;
+    font-size:12.5px;
+    color:var(--text-muted);
+    padding:0 4px;
+  }
+  .reveal-btn{
+    align-self:center;
+    background:var(--surface-raised);
+    color:var(--text);
+    padding:12px 26px;
+    border-radius:16px;
+    font-weight:700;
+    font-size:14px;
+  }
+  .review-actions{display:flex;gap:8px;margin-bottom:26px;}
+  .review-actions button{
+    flex:1;
+    padding:13px 6px;
+    border-radius:14px;
+    font-weight:700;
+    font-size:13px;
+  }
+  .btn-again{background:var(--surface);color:var(--rose);}
+  .btn-soso{background:var(--surface);color:var(--accent);}
+  .btn-good{background:var(--teal);color:#0d2320;}
+
+  .empty-state{
+    background:var(--surface);
+    border-radius:22px;
+    padding:34px 20px;
+    text-align:center;
+    color:var(--text-muted);
+    font-size:14px;
+    line-height:1.8;
+  }
+  .empty-state .big{font-size:30px;display:block;margin-bottom:10px;}
+  .ghost-btn{
+    display:inline-block;margin-top:14px;
+    background:var(--surface-raised);
+    color:var(--text);
+    padding:10px 18px;
+    border-radius:14px;
+    font-size:13px;
+  }
+
+  .progress-line{
+    text-align:center;font-size:12px;color:var(--text-muted);margin-bottom:14px;
+  }
+
+  /* ---------- Quiz ---------- */
+  .quiz-options{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
+  .quiz-opt{
+    text-align:left;
+    background:var(--surface-raised);
+    border:1.5px solid transparent;
+    border-radius:16px;
+    padding:13px 14px;
+    font-size:14px;
+    line-height:1.6;
+  }
+  .quiz-opt.correct{border-color:var(--teal);background:#1C332F;color:var(--teal);}
+  .quiz-opt.wrong{border-color:var(--rose);background:#331C24;color:var(--rose);}
+  .quiz-opt:disabled{opacity:.55;}
+  .quiz-opt:not(:disabled):active{transform:scale(.98);}
+  .explain-box{
+    margin-top:14px;background:var(--surface-raised);border-radius:16px;padding:14px 16px;
+    font-size:13px;color:var(--text-muted);line-height:1.7;
+  }
+  .explain-box strong{color:var(--text);}
+  .next-btn{
+    display:block;width:100%;margin-top:16px;
+    background:var(--accent);color:#241505;font-weight:700;
+    padding:14px;border-radius:16px;font-size:14px;
+    text-align:center;
+  }
+  .quiz-score{
+    text-align:center;font-size:12px;color:var(--text-muted);margin-bottom:14px;
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============ DATA ============ */
+const SCENES = [
+  {
+    id:'meal', emoji:'🍜', name:'食事中の会話', tagline:'一緒に食べる時間を心地よくする言葉',
+    phrases:[
+      {id:'meal-1', situation:'初対面の人とランチに入ったとき', phrase:'ここ、何が有名なんですか？よかったら教えてください', tip:'メニュー選びを話題にすると自然に会話が始まる'},
+      {id:'meal-2', situation:'料理が運ばれてきて感想を伝えたいとき', phrase:'これ、すごく美味しいですね。◯◯が効いてる気がします', tip:'具体的な感想を添えると社交辞令に聞こえにくい'},
+      {id:'meal-3', situation:'会話が途切れて沈黙が気まずいとき', phrase:'そういえば、最近何か面白いことありました？', tip:'「そういえば」は話題転換の万能フレーズ'},
+      {id:'meal-4', situation:'相手の好きな食べ物を知りたいとき', phrase:'◯◯さんって、普段どんなもの食べることが多いんですか？', tip:'好き嫌いより「普段何を食べるか」の方が答えやすい'},
+      {id:'meal-5', situation:'注文に迷っていて相手を巻き込みたいとき', phrase:'迷いますね、◯◯さんは何にします？一口交換とかどうですか', tip:'シェアの提案は打ち解けるきっかけになる'},
+      {id:'meal-6', situation:'昔話・思い出話につなげたいとき', phrase:'この味、なんか懐かしいですね。子どもの頃によく食べたものってあります？', tip:'味や匂いの感覚から思い出話に自然につながる'},
+      {id:'meal-7', situation:'相手の仕事の話をもっと聞きたいとき', phrase:'それ、もう少し詳しく聞いてもいいですか？', tip:'短く興味を示すだけで相手は話しやすくなる'},
+      {id:'meal-8', situation:'会計の場面で角が立たない一言', phrase:'今日はごちそうさまです、次は私に出させてください', tip:'「次回」を示すと関係の継続も伝えられる'},
+      {id:'meal-9', situation:'次回にまた会う約束につなげたいとき', phrase:'また美味しいお店知ってたら教えてください、今度行きましょう', tip:'具体的な行動を提案すると社交辞令で終わらない'},
+      {id:'meal-10', situation:'苦手な食べ物が出てきたとき、失礼にならない対応', phrase:'実はこれ苦手で……でも、◯◯さんの分まで美味しそうに食べますね（笑）', tip:'正直に伝えつつユーモアを添えて場を和ませる'},
+      {id:'meal-11', situation:'お店が混んでいて待たされているときの一言', phrase:'結構人気なんですね、期待が高まります', tip:'待ち時間もポジティブな一言に変換できる'},
+      {id:'meal-12', situation:'料理が来るまでの間の話題づくり', phrase:'そういえばこの辺、よく来られるんですか？', tip:'「場所」に関する質問は誰にでも振りやすい'},
+      {id:'meal-13', situation:'相手が食べるペースに配慮したいとき', phrase:'ゆっくりで大丈夫ですよ、私もお喋りしながら食べたいので', tip:'急かさない姿勢が伝わると相手も安心する'},
+      {id:'meal-14', situation:'デザート・締めの話題を作りたいとき', phrase:'甘いもの、別腹ですよね。何か頼みます？', tip:'軽いノリの話題は場を和ませる締めにちょうどいい'},
+      {id:'meal-15', situation:'お店の感想を共有して会話を締めたいとき', phrase:'今日のお店、当たりでしたね。誘ってくれてありがとうございます', tip:'感謝で締めると好印象のまま会話が終わる'}
+    ],
+    quiz:[
+      {id:'meal-q1', scenario:'初対面の相手とランチをしていて、会話がふと途切れてしまいました。次の一言として自然なのは？', options:['（黙って食べる）','そういえば、最近何か面白いことありました？','もう時間ないので早く食べましょう','何か話してください'], correct:1, explanation:'「そういえば」は自然に話題を変えられる便利なつなぎ言葉です。'},
+      {id:'meal-q2', scenario:'料理を一口食べて美味しいと感じました。適切な感想の伝え方は？', options:['まあまあですね','これ、すごく美味しいですね。◯◯が効いてる気がします','普通です','（無言でうなずくだけ）'], correct:1, explanation:'具体的な感想を添えると社交辞令に聞こえず、会話も広がります。'},
+      {id:'meal-q3', scenario:'相手が仕事の話を少ししてくれました。もっと聞きたいときの返し方は？', options:['「へえ」とだけ言う','それ、もう少し詳しく聞いてもいいですか？','話題を変える','「大変そうですね」とだけ言って終わる'], correct:1, explanation:'短く興味を示すだけで相手は話を続けやすくなります。'},
+      {id:'meal-q4', scenario:'会計の場面で、相手にごちそうしてもらいました。次回にもつながる一言は？', options:['「ありがとうございました」とだけ言う','今日はごちそうさまです、次は私に出させてください','高かったですね','何も言わない'], correct:1, explanation:'感謝に加えて「次回」を示すことで関係の継続を伝えられます。'},
+      {id:'meal-q5', scenario:'出てきた料理が実は苦手なものでした。失礼にならない対応は？', options:['黙って残す','「これ嫌いなんですよね」とはっきり言う','実はこれ苦手で……でも、◯◯さんの分まで美味しそうに食べますね（笑）','こっそり残して何も言わない'], correct:2, explanation:'正直に伝えつつユーモアを添えると場が和みます。'},
+      {id:'meal-q6', scenario:'食事が終わりに近づき、会話を良い雰囲気で締めたいです。適切な一言は？', options:['もう帰りましょう','今日のお店、当たりでしたね。誘ってくれてありがとうございます','無言で会計に向かう','「次はいつにしますか」と即座に予定を詰める'], correct:1, explanation:'感謝の言葉で締めると好印象のまま会話を終えられます。'}
+    ]
+  },
+  {
+    id:'invite', emoji:'🙋', name:'誘いたいとき', tagline:'相手が答えやすい誘い方のコツ',
+    phrases:[
+      {id:'invite-1', situation:'カジュアルにランチに誘いたいとき', phrase:'今度お昼、一緒にどうですか？', tip:'軽いトーンだと相手も気負わず答えやすい'},
+      {id:'invite-2', situation:'気になる人を食事に誘いたいとき', phrase:'今度、◯◯さんの好きなお店に連れて行ってもらえませんか？', tip:'相手に選んでもらう形は負担を減らし次の約束も引き出しやすい'},
+      {id:'invite-3', situation:'複数人を巻き込んで誘いやすくしたいとき', phrase:'今度みんなで飲みに行きません？◯◯さんも誘っていいですか？', tip:'グループにすると誘われる側の心理的ハードルが下がる'},
+      {id:'invite-4', situation:'断られにくいように選択肢を渡す誘い方', phrase:'今週か来週、どちらか都合いい日ありますか？', tip:'YES/NOではなく選択式にすると答えやすい'},
+      {id:'invite-5', situation:'急な誘いをするとき', phrase:'急なんですけど、今日この後空いてたりします？', tip:'「急なんですけど」と前置きすると唐突さが和らぐ'},
+      {id:'invite-6', situation:'前々から計画して誘うとき', phrase:'来月、◯◯のイベントあるんですけど、一緒に行きませんか？', tip:'早めの提案は予定を確保してもらいやすい'},
+      {id:'invite-7', situation:'趣味つながりで誘いたいとき', phrase:'◯◯好きって言ってましたよね、今度一緒に行きません？', tip:'相手の興味に触れると誘いの理由が自然になる'},
+      {id:'invite-8', situation:'久しぶりの相手を誘いたいとき', phrase:'久しぶりに会いたいなと思って、近々ご飯でもどうですか？', tip:'「会いたい」という気持ちをストレートに伝えるのも有効'},
+      {id:'invite-9', situation:'仕事関係者を誘いたいとき', phrase:'今度、情報交換も兼ねてお茶でもいかがですか？', tip:'目的を添えると仕事関係でも誘いやすくなる'},
+      {id:'invite-10', situation:'誘いの返事を急かさない言い方', phrase:'予定確認しておいてもらえたら嬉しいです、急ぎじゃないので', tip:'プレッシャーをかけない姿勢は好印象につながる'},
+      {id:'invite-11', situation:'前回流れた誘いを再度出すとき', phrase:'この間の話、もしよかったらまた改めて誘ってもいいですか？', tip:'「改めて」と添えると前回を気にせず誘い直せる'},
+      {id:'invite-12', situation:'イベントやライブに誘いたいとき', phrase:'これ気になってるんですけど、良かったら一緒に行きません？', tip:'自分の興味として伝えると誘いが自然になる'},
+      {id:'invite-13', situation:'二人きりで誘いたいとき', phrase:'二人でゆっくり話したいので、今度お茶でもどうですか？', tip:'「二人で」を明確にすることで意図が伝わりやすくなる'},
+      {id:'invite-14', situation:'グループの延長で個別に誘いたいとき', phrase:'この前の飲み会楽しかったですね、今度は二人でも行きましょう', tip:'過去の楽しい時間を引き合いに出すと誘いやすい'},
+      {id:'invite-15', situation:'予定が合わない相手に代案を出すとき', phrase:'その日厳しければ、別日でも全然大丈夫です', tip:'代案を用意しておくと誘いが流れにくい'}
+    ],
+    quiz:[
+      {id:'invite-q1', scenario:'同僚をランチに誘いたいですが、気負わせたくありません。適切な誘い方は？', options:['絶対来てください','今度お昼、一緒にどうですか？','暇なら来て','何も言わず一人で行く'], correct:1, explanation:'軽いトーンの提案は相手が答えやすくなります。'},
+      {id:'invite-q2', scenario:'相手の都合を確認しつつ、断られにくい誘い方をしたいです。', options:['来られますか？とだけ聞く','今週か来週、どちらか都合いい日ありますか？','絶対空けておいてください','何も聞かない'], correct:1, explanation:'選択式にするとYES/NOで断られにくくなります。'},
+      {id:'invite-q3', scenario:'急に予定が空いたので相手を誘いたいです。唐突さを和らげる言い方は？', options:['今すぐ来てください','急なんですけど、今日この後空いてたりします？','暇ですか？とだけ送る','何も言わず待つ'], correct:1, explanation:'「急なんですけど」という前置きで唐突さが和らぎます。'},
+      {id:'invite-q4', scenario:'前回誘って予定が流れてしまった相手を、また誘いたいです。', options:['気まずいので誘わない','この間の話、もしよかったらまた改めて誘ってもいいですか？','前回はすみませんでした、とだけ謝る','突然予定を決めて伝える'], correct:1, explanation:'「改めて」と添えると前回を気にせず誘い直せます。'},
+      {id:'invite-q5', scenario:'相手を誘ったが、その日は都合が悪いと言われました。誘いを流さない対応は？', options:['じゃあいいです','その日厳しければ、別日でも全然大丈夫です','何も返信しない','残念です、とだけ返す'], correct:1, explanation:'代案を出しておくと誘いがそこで終わりません。'},
+      {id:'invite-q6', scenario:'気になっている相手を、二人で食事に誘いたいです。意図を伝えつつ負担をかけない誘い方は？', options:['付き合ってください、といきなり伝える','二人でゆっくり話したいので、今度お茶でもどうですか？','暇なら来て','誘わずに様子を見続ける'], correct:1, explanation:'「二人で」を明確にしつつカジュアルな提案にすると意図が伝わりやすく負担も少ないです。'}
+    ]
+  },
+  {
+    id:'decline', emoji:'🙏', name:'誘いを断りたいとき', tagline:'関係を壊さずに気持ちよく断る言葉',
+    phrases:[
+      {id:'decline-1', situation:'忙しくて物理的に行けないとき', phrase:'行きたいんですが、その日はちょっと予定が詰まっていて……また誘ってもらえたら嬉しいです', tip:'「行きたい気持ち」を先に伝えると角が立ちにくい'},
+      {id:'decline-2', situation:'気分じゃないが関係を悪くしたくないとき', phrase:'今回はちょっと見送らせてください、また声かけてもらえると嬉しいです', tip:'理由を詳しく言わなくても「また」を添えれば十分伝わる'},
+      {id:'decline-3', situation:'すでに別の予定があるとき', phrase:'その日は先約が入っていて……次の機会にぜひ', tip:'「先約」は角の立たない万能な理由'},
+      {id:'decline-4', situation:'体調不良で断りたいとき', phrase:'体調があまり良くなくて、今回は控えておきます', tip:'体調は理由として最も理解されやすい'},
+      {id:'decline-5', situation:'お金の都合で断りたいとき', phrase:'今月ちょっと厳しくて……また今度誘ってください', tip:'正直に伝えても問題ない、繰り返さなければ角も立たない'},
+      {id:'decline-6', situation:'何度も誘われる相手に丁寧に断るとき', phrase:'誘ってもらえるのは嬉しいんですが、しばらくバタバタしていて……落ち着いたらこちらから連絡しますね', tip:'「こちらから連絡する」で関係を切らない姿勢を示せる'},
+      {id:'decline-7', situation:'代案を提示して断るとき', phrase:'その日は無理なんですが、◯日なら空いてます、どうですか？', tip:'代案を出すと断りが前向きな印象になる'},
+      {id:'decline-8', situation:'曖昧にせず、しかし優しく断りたいとき', phrase:'今回は行かないでおこうと思います、誘ってくれてありがとうございます', tip:'はっきり断りつつ感謝を添えるとバランスが取れる'},
+      {id:'decline-9', situation:'グループ全体の誘いを一人だけ断るとき', phrase:'今回は不参加にしますが、楽しんできてくださいね', tip:'相手を応援する一言を添えると気まずさが減る'},
+      {id:'decline-10', situation:'目上の人からの誘いを断るとき', phrase:'せっかくお誘いいただいたのですが、あいにく予定がございまして……また機会があればぜひ', tip:'丁寧な言い回しと「また機会があれば」で失礼にならない'},
+      {id:'decline-11', situation:'デートの誘いを断るとき（恋愛的関心がない場合）', phrase:'誘ってくれて嬉しいんですが、そういう形では考えられなくて', tip:'はっきり伝えることが結果的に相手のためにもなる'},
+      {id:'decline-12', situation:'二次会を断るとき', phrase:'今日はここで失礼しますね、楽しかったです', tip:'「楽しかった」を添えると気持ちよく切り上げられる'},
+      {id:'decline-13', situation:'今後も関係を保ちたい相手への断り方', phrase:'今回は難しいんですが、また誘ってくれると嬉しいです', tip:'「また誘ってほしい」を明言すると関係が途切れない'},
+      {id:'decline-14', situation:'即答できず保留したいとき', phrase:'ちょっと予定確認しますね、少し待ってもらえますか？', tip:'保留も立派な返し方、無理に即決しなくていい'},
+      {id:'decline-15', situation:'断った後にフォローの一言を添えたいとき', phrase:'誘ってくれて本当にありがとう、また今度お願いします', tip:'断りの最後は感謝で締めると印象が柔らかくなる'}
+    ],
+    quiz:[
+      {id:'decline-q1', scenario:'忙しくて誘いに行けませんが、関係を悪くしたくありません。適切な断り方は？', options:['無理です、とだけ返す','行きたいんですが、その日はちょっと予定が詰まっていて……また誘ってもらえたら嬉しいです','返信しない','興味ないです'], correct:1, explanation:'行きたい気持ちを先に伝え、次への誘いを促す言い方が角を立てません。'},
+      {id:'decline-q2', scenario:'目上の人からの誘いを断る必要があります。失礼にならない言い方は？', options:['無理です、すみません','せっかくお誘いいただいたのですが、あいにく予定がございまして……また機会があればぜひ','行きたくないです','曖昧に流して返事をしない'], correct:1, explanation:'丁寧な言い回しと「また機会があれば」で失礼な印象を避けられます。'},
+      {id:'decline-q3', scenario:'恋愛的な関心がない相手からデートに誘われました。相手のためにもなる誠実な断り方は？', options:['ずっと曖昧にしてフェードアウトする','誘ってくれて嬉しいんですが、そういう形では考えられなくて','今は忙しいので、とだけ言って先延ばしにする','無視する'], correct:1, explanation:'はっきり伝えることが、結果的に相手にとっても誠実な対応になります。'},
+      {id:'decline-q4', scenario:'すぐに予定を答えられない状況で、誘いを保留したいです。', options:['無理です、と決めつけて断る','ちょっと予定確認しますね、少し待ってもらえますか？','返信を後回しにして放置する','とりあえず行きます、と答える'], correct:1, explanation:'保留も立派な返し方で、無理に即決する必要はありません。'},
+      {id:'decline-q5', scenario:'グループでの誘いに一人だけ参加できません。気まずさを減らす一言は？', options:['何も言わず不参加にする','今回は不参加にしますが、楽しんできてくださいね','行きたくないので、とだけ伝える','みんなに謝り続ける'], correct:1, explanation:'相手を応援する一言を添えると気まずさが和らぎます。'},
+      {id:'decline-q6', scenario:'何度も同じ相手から誘われていて、今は応じられません。関係を保ちながら断るには？', options:['完全に返信をやめる','誘ってもらえるのは嬉しいんですが、しばらくバタバタしていて……落ち着いたらこちらから連絡しますね','もう誘わないでください','毎回理由もなく断り続ける'], correct:1, explanation:'「こちらから連絡する」という姿勢を示すことで関係を切らずに断れます。'}
+    ]
+  },
+  {
+    id:'message', emoji:'💬', name:'LINE・DMのメッセージ', tagline:'文字だけでも気持ちよく伝わるやりとり',
+    phrases:[
+      {id:'message-1', situation:'会話のきっかけを作る最初の一言', phrase:'突然すみません、◯◯を見て気になったので連絡してみました', tip:'連絡した理由を添えると唐突さが和らぐ'},
+      {id:'message-2', situation:'既読スルーされた後、会話を再開したいとき', phrase:'お忙しいところすみません、お時間あるときで大丈夫です', tip:'プレッシャーをかけない言い方だと再開しやすい'},
+      {id:'message-3', situation:'相手の話題に共感を示す返信', phrase:'わかります、それめちゃくちゃ良いですよね', tip:'共感から入ると会話が続きやすい'},
+      {id:'message-4', situation:'質問で会話を広げたいとき', phrase:'それってどういうきっかけで始めたんですか？', tip:'「きっかけ」を聞くと相手の話が広がりやすい'},
+      {id:'message-5', situation:'軽いノリで返したいとき', phrase:'それ最高すぎます（笑）', tip:'テンポの良い短い返信は会話のリズムを保つ'},
+      {id:'message-6', situation:'誘いを切り出すメッセージ', phrase:'今度、時間あったら一緒にどうですか？', tip:'メッセージでの誘いは軽めのトーンが受け取りやすい'},
+      {id:'message-7', situation:'お礼を伝えるメッセージ', phrase:'今日はありがとうございました、すごく楽しかったです', tip:'具体的な感想を添えると気持ちが伝わる'},
+      {id:'message-8', situation:'謝罪のメッセージ', phrase:'返信遅くなってすみません、◯◯で立て込んでいました', tip:'理由を一言添えると誠実さが伝わる'},
+      {id:'message-9', situation:'久しぶりの相手への連絡', phrase:'お久しぶりです、最近どうしてるかなと思って連絡してみました', tip:'「思い出した理由」を伝えると自然な連絡になる'},
+      {id:'message-10', situation:'近況報告を送りたいとき', phrase:'最近◯◯を始めたんですが、なかなか面白いですよ', tip:'近況＋相手への話題提供をセットにすると返信しやすくなる'},
+      {id:'message-11', situation:'相手の投稿に反応した後、個別にメッセージを送りたいとき', phrase:'さっきの投稿見ました、すごく良かったです', tip:'「さっきの」で具体性が出て社交辞令に見えにくい'},
+      {id:'message-12', situation:'会話を自然に終わらせたいとき', phrase:'今日は楽しかったです、また話しましょう', tip:'「また」で終わると次につながる印象を残せる'},
+      {id:'message-13', situation:'深夜のメッセージへの返し方', phrase:'こんな時間にどうしたんですか？何かありました？', tip:'時間帯を気にかける一言で相手への気遣いが伝わる'},
+      {id:'message-14', situation:'グループから個別のやりとりに切り替えたいとき', phrase:'さっきの話、個別で少し聞いてもいいですか？', tip:'「さっきの話」を引き合いに出すと自然に個別に移行できる'},
+      {id:'message-15', situation:'好意をやんわり伝えたいとき', phrase:'◯◯さんと話してると、すごく楽しいなって思います', tip:'直接的すぎず、しかし気持ちが伝わる言い回し'}
+    ],
+    quiz:[
+      {id:'message-q1', scenario:'気になる人に初めてDMを送ります。唐突にならない一言は？', options:['こんにちは、とだけ送る','突然すみません、◯◯を見て気になったので連絡してみました','気になってます、といきなり伝える','スタンプだけ送る'], correct:1, explanation:'連絡した理由を添えると唐突さが和らぎます。'},
+      {id:'message-q2', scenario:'送ったメッセージが既読のまま返信が来ません。数日後に再開したいときの言い方は？', options:['なんで返信くれないんですか','お忙しいところすみません、お時間あるときで大丈夫です','何度も催促する','もう二度と連絡しない'], correct:1, explanation:'プレッシャーをかけない言い方の方が再開しやすいです。'},
+      {id:'message-q3', scenario:'相手が近況を送ってくれました。会話を広げたいときの返し方は？', options:['そうなんですね、とだけ返す','それってどういうきっかけで始めたんですか？','スタンプだけで返す','話題を無視して別の話をする'], correct:1, explanation:'「きっかけ」を聞く質問は相手の話を広げやすいです。'},
+      {id:'message-q4', scenario:'返信が遅くなってしまいました。誠実に伝える謝り方は？', options:['何も触れずに返信する','返信遅くなってすみません、◯◯で立て込んでいました','忙しかったので、とだけ書く','謝らずスタンプで誤魔化す'], correct:1, explanation:'理由を一言添えると誠実さが伝わりやすいです。'},
+      {id:'message-q5', scenario:'深夜に相手からメッセージが届きました。気遣いを示す返し方は？', options:['こんな時間に非常識です','こんな時間にどうしたんですか？何かありました？','無視して翌朝まで放置','スタンプだけ送る'], correct:1, explanation:'時間帯を気にかける一言は相手への気遣いとして伝わります。'},
+      {id:'message-q6', scenario:'好きな気持ちを、重くならない形でやんわり伝えたいです。', options:['好きです、付き合ってください、といきなり送る','◯◯さんと話してると、すごく楽しいなって思います','何も伝えず様子を見続ける','友達に気持ちを伝えてもらう'], correct:1, explanation:'直接的すぎず、しかし気持ちが伝わる言い回しとして適しています。'}
+    ]
+  },
+  {
+    id:'comment', emoji:'📱', name:'投稿へのコメント', tagline:'SNSの投稿にちょうどいい反応を返す',
+    phrases:[
+      {id:'comment-1', situation:'旅行の写真への反応', phrase:'素敵な景色ですね、どこの写真ですか？', tip:'場所を聞くと会話が続きやすい'},
+      {id:'comment-2', situation:'食事の写真への反応', phrase:'美味しそう、これどこのお店ですか？', tip:'「どこ」を聞くと具体的な返信を引き出せる'},
+      {id:'comment-3', situation:'ペットの写真への反応', phrase:'めちゃくちゃ可愛いです、名前なんていうんですか？', tip:'ペット投稿は褒め＋質問で反応がもらいやすい'},
+      {id:'comment-4', situation:'仕事の成果報告への反応', phrase:'すごいですね、おめでとうございます！', tip:'素直な祝福が一番伝わりやすい'},
+      {id:'comment-5', situation:'誕生日投稿への反応', phrase:'お誕生日おめでとうございます、素敵な一年になりますように', tip:'定番フレーズでも気持ちがこもっていれば十分伝わる'},
+      {id:'comment-6', situation:'子どもの成長投稿への反応', phrase:'大きくなりましたね、成長早いですね', tip:'「成長」に触れると親御さんは喜びやすい'},
+      {id:'comment-7', situation:'資格取得・合格報告への反応', phrase:'おめでとうございます、努力が実りましたね', tip:'「努力」に触れると相手の頑張りを認める言葉になる'},
+      {id:'comment-8', situation:'引っ越し報告への反応', phrase:'新生活楽しみですね、落ち着いたら遊びに行かせてください', tip:'「今後」につながる一言を添えると関係が続く'},
+      {id:'comment-9', situation:'新しい趣味の投稿への反応', phrase:'面白そうですね、私もやってみたいです', tip:'興味を示すと相手も話したくなる'},
+      {id:'comment-10', situation:'落ち込んでいる投稿への気遣い', phrase:'大変でしたね、無理しないでくださいね', tip:'アドバイスより先に気遣いの言葉を添える'},
+      {id:'comment-11', situation:'おしゃれな自撮りへの反応', phrase:'その服すごく似合ってますね', tip:'具体的な部分を褒めると社交辞令に聞こえにくい'},
+      {id:'comment-12', situation:'作品（絵・ハンドメイドなど）投稿への反応', phrase:'これ本当にすごいです、どのくらい時間かかったんですか？', tip:'「どのくらい時間が」は制作への敬意が伝わる質問'},
+      {id:'comment-13', situation:'スポーツ・運動の記録投稿への反応', phrase:'すごい記録ですね、継続力尊敬します', tip:'「継続」に触れると努力そのものを認める言葉になる'},
+      {id:'comment-14', situation:'ライブ・イベント参加報告への反応', phrase:'楽しそうですね、私も気になってたイベントです', tip:'自分の興味も添えると次の会話につながりやすい'},
+      {id:'comment-15', situation:'日常の何気ない投稿への反応', phrase:'これ、なんかいいですね。ほっとします', tip:'大きなリアクションでなくても素直な一言で十分'}
+    ],
+    quiz:[
+      {id:'comment-q1', scenario:'友人が旅行の写真を投稿しました。会話につながるコメントは？', options:['いいね、だけ押す','素敵な景色ですね、どこの写真ですか？','羨ましいです、とだけ書く','コメントしない'], correct:1, explanation:'場所を聞くと相手が返信しやすく、会話が続きます。'},
+      {id:'comment-q2', scenario:'友人が落ち込んでいる内容の投稿をしました。最初にかける言葉として適切なのは？', options:['頑張って！と励ます','大変でしたね、無理しないでくださいね','何があったんですか？と詳しく聞く','私も大変でした、と自分の話をする'], correct:1, explanation:'アドバイスや励ましより先に、気遣いの言葉を添えるのが適切です。'},
+      {id:'comment-q3', scenario:'友人が資格試験に合格した投稿をしました。頑張りを認めるコメントは？', options:['良かったですね、とだけ書く','おめでとうございます、努力が実りましたね','私も受けようか迷ってます','スタンプのみ'], correct:1, explanation:'「努力」に触れると相手の頑張りそのものを認める言葉になります。'},
+      {id:'comment-q4', scenario:'友人がハンドメイド作品を投稿しました。制作への敬意が伝わるコメントは？', options:['可愛いです、とだけ書く','これ本当にすごいです、どのくらい時間かかったんですか？','私には作れないです','コメントしない'], correct:1, explanation:'制作にかかった時間を尋ねることで、作品への敬意と関心が伝わります。'},
+      {id:'comment-q5', scenario:'友人がおしゃれな自撮りを投稿しました。社交辞令に聞こえにくいコメントは？', options:['可愛いですね、とだけ書く','その服すごく似合ってますね','いいね、だけ押す','何も言わない'], correct:1, explanation:'服や髪型など具体的な部分を褒めると、社交辞令に聞こえにくくなります。'},
+      {id:'comment-q6', scenario:'友人が新しい趣味を始めたという投稿をしました。相手が話したくなるコメントは？', options:['へえ、とだけ書く','面白そうですね、私もやってみたいです','それ流行ってますよね','反応しない'], correct:1, explanation:'興味を示すコメントは相手がその話題をさらに話したくなるきっかけになります。'}
+    ]
+  },
+  {
+    id:'celebration', emoji:'🎁', name:'お祝いメッセージ', tagline:'節目の気持ちを言葉にして届ける',
+    phrases:[
+      {id:'celebration-1', situation:'出産祝い', phrase:'ご出産おめでとうございます、新しい家族との毎日が素敵な時間になりますように', tip:'赤ちゃんとご家族両方への気遣いを添えると温かみが増す'},
+      {id:'celebration-2', situation:'結婚祝い', phrase:'ご結婚おめでとうございます、お二人らしい幸せな家庭を築いていってください', tip:'「お二人らしい」でパーソナルな一言になる'},
+      {id:'celebration-3', situation:'誕生日（親しい友人）', phrase:'誕生日おめでとう！今年もたくさん楽しいことがありますように', tip:'親しい相手には軽やかなトーンで十分伝わる'},
+      {id:'celebration-4', situation:'誕生日（目上の人向け）', phrase:'お誕生日おめでとうございます、これからもどうぞご健勝でお過ごしください', tip:'目上の人には健康を気遣う言葉が適している'},
+      {id:'celebration-5', situation:'昇進・昇格', phrase:'ご昇進おめでとうございます、日頃の努力が評価されましたね', tip:'「日頃の努力」に触れると本人の頑張りを認める言葉になる'},
+      {id:'celebration-6', situation:'転職・新しい仕事のスタート', phrase:'新しいスタート、おめでとうございます。応援しています', tip:'「応援しています」は今後も気にかけている姿勢を伝えられる'},
+      {id:'celebration-7', situation:'開業・独立', phrase:'ご開業おめでとうございます、◯◯さんらしい形で頑張ってください', tip:'相手の個性に触れると定型文っぽくならない'},
+      {id:'celebration-8', situation:'結婚記念日（周年）', phrase:'結婚◯周年おめでとうございます、これからも素敵な夫婦でいてください', tip:'具体的な年数を入れると心がこもって見える'},
+      {id:'celebration-9', situation:'引っ越し・新居', phrase:'新居おめでとうございます、落ち着いたらぜひ遊びに行かせてください', tip:'「遊びに行きたい」を添えると純粋な祝福以上の親しみが伝わる'},
+      {id:'celebration-10', situation:'合格・資格取得', phrase:'合格おめでとうございます、これまでの頑張りが報われましたね', tip:'結果だけでなくプロセスに触れると気持ちが伝わりやすい'},
+      {id:'celebration-11', situation:'卒業', phrase:'ご卒業おめでとうございます、新しい環境でのご活躍を楽しみにしています', tip:'「これから」に目を向けた祝福が卒業には合う'},
+      {id:'celebration-12', situation:'快気祝い（退院・回復）', phrase:'ご回復おめでとうございます、無理せずゆっくり過ごしてくださいね', tip:'喜びと同時に「無理しないで」の気遣いを添える'},
+      {id:'celebration-13', situation:'ペットを迎えた', phrase:'新しい家族、おめでとうございます！写真もっと見たいです', tip:'「もっと見たい」は相手が話したくなる自然な一言'},
+      {id:'celebration-14', situation:'受賞・表彰', phrase:'受賞おめでとうございます、本当にすごいです', tip:'シンプルな驚きと賞賛が一番気持ちよく伝わる'},
+      {id:'celebration-15', situation:'定年退職', phrase:'長年お疲れ様でした、これからのお時間をゆっくり楽しんでください', tip:'ねぎらいと今後への言葉をセットにする'}
+    ],
+    quiz:[
+      {id:'celebration-q1', scenario:'友人が出産しました。赤ちゃんとご家族両方への気遣いが伝わるメッセージは？', options:['おめでとうございます、とだけ送る','ご出産おめでとうございます、新しい家族との毎日が素敵な時間になりますように','大変でしたね、とだけ送る','スタンプだけ送る'], correct:1, explanation:'赤ちゃんとご家族両方への気遣いを添えると温かみのあるメッセージになります。'},
+      {id:'celebration-q2', scenario:'上司が昇進しました。本人の努力を認める祝福メッセージは？', options:['良かったですね、とだけ送る','ご昇進おめでとうございます、日頃の努力が評価されましたね','羨ましいです','何も送らない'], correct:1, explanation:'「日頃の努力」に触れることで本人の頑張りを認める言葉になります。'},
+      {id:'celebration-q3', scenario:'友人が入院から退院しました。喜びと気遣いを両方伝えるメッセージは？', options:['良かったですね、とだけ書く','ご回復おめでとうございます、無理せずゆっくり過ごしてくださいね','大変でしたね、とだけ書く','何も送らない'], correct:1, explanation:'回復の喜びと同時に「無理しないで」という気遣いを添えるのが適切です。'},
+      {id:'celebration-q4', scenario:'目上の方の誕生日にメッセージを送ります。適切なトーンは？', options:['誕生日おめでとう！とカジュアルに送る','お誕生日おめでとうございます、これからもどうぞご健勝でお過ごしください','スタンプだけ送る','歳を取りましたね、と送る'], correct:1, explanation:'目上の人には健康を気遣う丁寧な言葉が適しています。'},
+      {id:'celebration-q5', scenario:'友人がペットを新しく迎えました。相手が話したくなる祝福メッセージは？', options:['良かったですね、とだけ書く','新しい家族、おめでとうございます！写真もっと見たいです','大変じゃないですか？','反応しない'], correct:1, explanation:'「もっと見たい」という一言は相手が自然に話したくなるきっかけになります。'},
+      {id:'celebration-q6', scenario:'同僚が定年退職を迎えました。長年の労をねぎらうメッセージは？', options:['お疲れ様でした、とだけ書く','長年お疲れ様でした、これからのお時間をゆっくり楽しんでください','寂しくなりますね、とだけ書く','何も送らない'], correct:1, explanation:'ねぎらいの言葉と今後への言葉をセットにすると気持ちが伝わりやすいです。'}
+    ]
+  }
+];
+
+const BOX_INTERVALS = [1,2,4,7,14]; // days until next due, indexed by box level (0-4)
+const MASTER_BOX = 3;
+const STORAGE_KEY = 'hitokotochou_progress_v1';
+
+/* ============ STORAGE ============ */
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function addDays(str, days){
+  const d = new Date(str+'T00:00:00');
+  d.setDate(d.getDate()+days);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return {cards:{}, quizStats:{}, streak:{last:null, count:0}};
+}
+let PROGRESS = loadProgress();
+function saveProgress(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(PROGRESS)); }catch(e){}
+}
+function getCardState(id){
+  return PROGRESS.cards[id] || {box:0, due: todayStr()};
+}
+function isDue(id){
+  return getCardState(id).due <= todayStr();
+}
+function reviewCard(id, result){
+  const cur = getCardState(id);
+  let box = cur.box;
+  if(result==='again') box = Math.max(0, box-1);
+  else if(result==='good') box = Math.min(BOX_INTERVALS.length-1, box+1);
+  // 'soso' keeps box the same
+  const due = addDays(todayStr(), BOX_INTERVALS[box]);
+  PROGRESS.cards[id] = {box, due};
+  touchStreak();
+  saveProgress();
+}
+function touchStreak(){
+  const t = todayStr();
+  const s = PROGRESS.streak || {last:null, count:0};
+  if(s.last === t){ /* already counted today */ }
+  else if(s.last === addDays(t,-1)){ s.count += 1; s.last = t; }
+  else { s.count = 1; s.last = t; }
+  PROGRESS.streak = s;
+}
+function masteredCount(sceneId){
+  const scene = SCENES.find(s=>s.id===sceneId);
+  return scene.phrases.filter(p => getCardState(p.id).box >= MASTER_BOX).length;
+}
+function totalMastered(){
+  return SCENES.reduce((sum,s)=>sum+masteredCount(s.id),0);
+}
+function recordQuizAnswer(sceneId, correct){
+  const stats = PROGRESS.quizStats[sceneId] || {correct:0,total:0};
+  stats.total += 1;
+  if(correct) stats.correct += 1;
+  PROGRESS.quizStats[sceneId] = stats;
+  touchStreak();
+  saveProgress();
+}
+
+/* ============ STATE / ROUTER ============ */
+let VIEW = {screen:'home'};
+let SESSION = {}; // ephemeral session state for flash/quiz
+
+function goHome(){ VIEW = {screen:'home'}; SESSION={}; render(); window.scrollTo(0,0); }
+function openScene(id){ VIEW = {screen:'scene', sceneId:id}; SESSION={}; render(); window.scrollTo(0,0); }
+function backToSceneMenu(){ VIEW = {screen:'scene', sceneId:VIEW.sceneId}; SESSION={}; render(); window.scrollTo(0,0); }
+
+function startFlash(sceneId){
+  const scene = SCENES.find(s=>s.id===sceneId);
+  const due = scene.phrases.filter(p=>isDue(p.id));
+  SESSION.flashQueue = due.map(p=>p.id);
+  SESSION.flashIdx = 0;
+  SESSION.flipped = false;
+  VIEW = {screen:'scene', sceneId, mode:'flash'};
+  render(); window.scrollTo(0,0);
+}
+function startFlashAll(sceneId){
+  const scene = SCENES.find(s=>s.id===sceneId);
+  SESSION.flashQueue = scene.phrases.map(p=>p.id);
+  SESSION.flashIdx = 0;
+  SESSION.flipped = false;
+  VIEW = {screen:'scene', sceneId, mode:'flash'};
+  render(); window.scrollTo(0,0);
+}
+function flipCard(){ SESSION.flipped = true; render(); }
+function answerCard(result){
+  const id = SESSION.flashQueue[SESSION.flashIdx];
+  reviewCard(id, result);
+  SESSION.flashIdx += 1;
+  SESSION.flipped = false;
+  render();
+}
+
+function startQuiz(sceneId){
+  const scene = SCENES.find(s=>s.id===sceneId);
+  const order = scene.quiz.map((q,i)=>i);
+  for(let i=order.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [order[i],order[j]]=[order[j],order[i]]; }
+  SESSION.quizOrder = order;
+  SESSION.quizIdx = 0;
+  SESSION.quizSelected = null;
+  SESSION.quizRoundScore = 0;
+  VIEW = {screen:'scene', sceneId, mode:'quiz'};
+  render(); window.scrollTo(0,0);
+}
+function selectQuizOption(optIdx){
+  if(SESSION.quizSelected !== null && SESSION.quizSelected !== undefined) return;
+  const scene = SCENES.find(s=>s.id===VIEW.sceneId);
+  const q = scene.quiz[SESSION.quizOrder[SESSION.quizIdx]];
+  SESSION.quizSelected = optIdx;
+  const correct = optIdx === q.correct;
+  if(correct) SESSION.quizRoundScore += 1;
+  recordQuizAnswer(scene.id, correct);
+  render();
+}
+function nextQuizQuestion(){
+  SESSION.quizIdx += 1;
+  SESSION.quizSelected = null;
+  if(SESSION.quizIdx >= SESSION.quizOrder.length){
+    VIEW = {screen:'scene', sceneId:VIEW.sceneId, mode:'quizDone'};
+  }
+  render(); window.scrollTo(0,0);
+}
+function resetProgress(){
+  if(confirm('これまでの学習の進み具合をすべてリセットします。よろしいですか？')){
+    PROGRESS = {cards:{}, quizStats:{}, streak:{last:null, count:0}};
+    saveProgress();
+    goHome();
+  }
+}
+
+/* ============ RENDER ============ */
+function esc(s){
+  return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+
+function render(){
+  const app = document.getElementById('app');
+  if(VIEW.screen==='home') app.innerHTML = renderHome();
+  else if(VIEW.screen==='scene') app.innerHTML = renderScene();
+  app.scrollTop = 0;
+}
+
+function renderHome(){
+  const mastered = totalMastered();
+  const streak = (PROGRESS.streak && PROGRESS.streak.count) || 0;
+  let dueTotal = 0;
+  SCENES.forEach(s=> s.phrases.forEach(p=>{ if(isDue(p.id)) dueTotal+=1; }));
+
+  const cards = SCENES.map(s=>{
+    const m = masteredCount(s.id);
+    const pct = Math.round(m/s.phrases.length*100);
+    return `
+      <button class="scene-card" onclick="openScene('${s.id}')">
+        <span class="emoji">${s.emoji}</span>
+        <div class="name">${esc(s.name)}</div>
+        <div class="scene-progress"><div style="width:${pct}%"></div></div>
+        <div class="count">${m} / ${s.phrases.length} 習得</div>
+      </button>`;
+  }).join('');
+
+  return `
+    <div class="home-header">
+      <div class="brand"><h1>ひとこと帳</h1></div>
+      <div class="tagline">シーンで学ぶ、伝え方の練習。まずは雑談から、少しずつ広げていきます。</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-chip"><span class="num">${mastered}</span><span class="label">習得フレーズ</span></div>
+      <div class="stat-chip"><span class="num">${streak}</span><span class="label">連続学習日数</span></div>
+      <div class="stat-chip"><span class="num">${dueTotal}</span><span class="label">今日の復習</span></div>
+    </div>
+    <div class="scene-grid">${cards}</div>
+    <button class="footer-link" onclick="resetProgress()">進捗をリセットする</button>
+  `;
+}
+
+function renderScene(){
+  const scene = SCENES.find(s=>s.id===VIEW.sceneId);
+  const mode = VIEW.mode;
+
+  if(!mode){
+    const due = scene.phrases.filter(p=>isDue(p.id)).length;
+    const stats = PROGRESS.quizStats[scene.id] || {correct:0,total:0};
+    return `
+      <button class="back-btn" onclick="goHome()">← シーン一覧</button>
+      <div class="scene-title"><span class="emoji">${scene.emoji}</span><h2>${esc(scene.name)}</h2></div>
+      <div class="scene-tagline">${esc(scene.tagline)}</div>
+
+      <div class="mode-card">
+        <div class="mtext">
+          <div class="mtitle">フレーズ暗記</div>
+          <div class="mdesc">シーンを見て、ふさわしい一言を思い出す練習。${due>0? `今日は${due}件が復習のタイミングです。` : '今日の分はすべて復習済みです。'}</div>
+        </div>
+        <button class="go" onclick="${due>0? `startFlash('${scene.id}')` : `startFlashAll('${scene.id}')`}">${due>0? 'はじめる' : '全部練習'}</button>
+      </div>
+
+      <div class="mode-card">
+        <div class="mtext">
+          <div class="mtitle">シーン別クイズ</div>
+          <div class="mdesc">場面に合う返し方を4択で選ぶ練習。${stats.total>0? `正答率 ${Math.round(stats.correct/stats.total*100)}%（${stats.total}問挑戦）` : 'まだ挑戦していません'}</div>
+        </div>
+        <button class="go" onclick="startQuiz('${scene.id}')">はじめる</button>
+      </div>
+    `;
+  }
+
+  if(mode==='flash') return renderFlash(scene);
+  if(mode==='quiz') return renderQuiz(scene);
+  if(mode==='quizDone') return renderQuizDone(scene);
+  return '';
+}
+
+function renderFlash(scene){
+  const queue = SESSION.flashQueue || [];
+  const idx = SESSION.flashIdx || 0;
+
+  if(idx >= queue.length){
+    return `
+      <button class="back-btn" onclick="backToSceneMenu()">← ${esc(scene.name)}</button>
+      <div class="empty-state">
+        <span class="big">✅</span>
+        今日の分の練習が終わりました。<br>お疲れさまです。
+        <br><button class="ghost-btn" onclick="startFlashAll('${scene.id}')">もう一度全部練習する</button>
+      </div>
+    `;
+  }
+
+  const id = queue[idx];
+  const p = scene.phrases.find(x=>x.id===id);
+  const flipped = SESSION.flipped;
+
+  return `
+    <button class="back-btn" onclick="backToSceneMenu()">← ${esc(scene.name)}</button>
+    <div class="progress-line">${idx+1} / ${queue.length}</div>
+    <div class="chat-pane">
+      <div class="bubble situation">${esc(p.situation)}</div>
+      ${flipped ? `
+        <div class="bubble reply">${esc(p.phrase)}</div>
+        <div class="bubble tip">💡 ${esc(p.tip)}</div>
+      ` : `
+        <button class="reveal-btn" onclick="flipCard()">ひとことを見る</button>
+      `}
+    </div>
+    ${flipped ? `
+      <div class="review-actions">
+        <button class="btn-again" onclick="answerCard('again')">まだ不安</button>
+        <button class="btn-soso" onclick="answerCard('soso')">まあまあ</button>
+        <button class="btn-good" onclick="answerCard('good')">覚えた</button>
+      </div>
+    ` : ''}
+  `;
+}
+
+function renderQuiz(scene){
+  const order = SESSION.quizOrder || [];
+  const idx = SESSION.quizIdx || 0;
+  const q = scene.quiz[order[idx]];
+  const selected = SESSION.quizSelected;
+  const answered = selected !== null && selected !== undefined;
+
+  const options = q.options.map((opt,i)=>{
+    let cls = 'quiz-opt';
+    if(answered && i===q.correct) cls += ' correct';
+    else if(answered && i===selected && i!==q.correct) cls += ' wrong';
+    return `<button class="${cls}" ${answered?'disabled':''} onclick="selectQuizOption(${i})">${esc(opt)}</button>`;
+  }).join('');
+
+  return `
+    <button class="back-btn" onclick="backToSceneMenu()">← ${esc(scene.name)}</button>
+    <div class="progress-line">${idx+1} / ${order.length}</div>
+    <div class="chat-pane" style="min-height:auto;">
+      <div class="bubble situation" style="max-width:100%;">${esc(q.scenario)}</div>
+    </div>
+    <div class="quiz-options">${options}</div>
+    ${answered ? `
+      <div class="explain-box"><strong>${selected===q.correct? '正解です。':'惜しい。'}</strong> ${esc(q.explanation)}</div>
+      <button class="next-btn" onclick="nextQuizQuestion()">${idx+1>=order.length? '結果を見る':'次の問題'}</button>
+    ` : ''}
+  `;
+}
+
+function renderQuizDone(scene){
+  const score = SESSION.quizRoundScore || 0;
+  const total = (SESSION.quizOrder||[]).length;
+  const stats = PROGRESS.quizStats[scene.id] || {correct:0,total:0};
+  return `
+    <button class="back-btn" onclick="backToSceneMenu()">← ${esc(scene.name)}</button>
+    <div class="empty-state">
+      <span class="big">🎉</span>
+      今回は ${total}問中 ${score}問正解でした。
+      <div class="quiz-score" style="margin-top:10px;">通算正答率 ${stats.total>0? Math.round(stats.correct/stats.total*100):0}%（${stats.total}問挑戦）</div>
+      <button class="ghost-btn" onclick="startQuiz('${scene.id}')">もう一度挑戦する</button>
+    </div>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>
